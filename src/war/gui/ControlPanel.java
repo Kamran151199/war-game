@@ -4,6 +4,7 @@ import war.WarModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * <strong>Final Project</strong><br>
@@ -11,8 +12,8 @@ import java.awt.*;
  *
  * @author Komron Valijonov
  */
-public class ControlPanel extends JPanel {
-    private final WarModel model;
+public class ControlPanel extends JPanel implements Serializable {
+    private WarModel model;
     private final JButton actionBtn = new JButton(), newGameBtn = new JButton("New Game");
     private final JButton autoPlayBtn = new JButton("Auto-play");
     private final JLabel cardCount1 = new JLabel("26"), cardCount2 = new JLabel("26");
@@ -45,6 +46,21 @@ public class ControlPanel extends JPanel {
         // add "new game" button
         buttons.add(newGameBtn, BorderLayout.WEST);
         newGameBtn.addActionListener(a -> model.newGame());
+
+        // add "save game" button
+        JButton saveGameBtn = new JButton("Save Game");
+        buttons.add(saveGameBtn, BorderLayout.BEFORE_FIRST_LINE);
+        saveGameBtn.addActionListener(a -> {
+            model.saveGame();
+        });
+
+        // add "load game" button
+        JButton loadGameBtn = new JButton("Load Game");
+        buttons.add(loadGameBtn, BorderLayout.AFTER_LAST_LINE);
+        loadGameBtn.addActionListener(a -> {
+            model.loadGame();
+        });
+
 
         // add "auto-play" button
         buttons.add(autoPlayBtn, BorderLayout.EAST);
@@ -113,5 +129,9 @@ public class ControlPanel extends JPanel {
     public void setAction(String name, Runnable action) {
         actionBtn.setText(name);
         this.action = action;
+    }
+
+    public void setModel(WarModel model) {
+        this.model = model;
     }
 }

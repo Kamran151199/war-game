@@ -1,5 +1,6 @@
 package war;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,9 @@ import java.util.List;
  *
  * @author Komron Valijonov
  */
-public class Card implements Comparable<Card> {
+public class Card implements Comparable<Card>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     // Ranks
     public static final int RANK_FIRST = 2; // least value
     public static final int RANK_LAST = 14; // greatest value (ace)

@@ -1,5 +1,6 @@
 package war;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -12,20 +13,38 @@ import java.util.List;
  *
  * @author Komron Valijonov
  */
-public class WarModel {
-    private final IWarView view;
-    private final List<Card> pool = new ArrayList<>();  // cards in the pool (Cards that are currently in the middle of a turn)
+public class WarModel implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private transient final IWarView view;
+    private List<Card> pool = new ArrayList<>();  // cards in the pool (Cards that are currently in the middle of a turn)
     private Player player1, player2;
     private boolean gameOver = true;  // true if the game is over
     private boolean war = false;  // true if the game is in a state of war (the war state is when two cards are equal)
+    private transient StorageModel storage;
+    private Card currentlyDrawnCard1;
+    private Card currentlyDrawnCard2;
+
+    public Card getCurrentlyDrawnCard(boolean p1) {
+        return p1 ? currentlyDrawnCard1 : currentlyDrawnCard2;
+    }
+
+    public void setCurrentlyDrawnCard(Card card, boolean p1) {
+        if (p1)
+            currentlyDrawnCard1 = card;
+        else
+            currentlyDrawnCard2 = card;
+    }
+
 
     /**
      * Constructs a new model.
      *
      * @param view to notify as game progresses (MVC)
      */
-    public WarModel(IWarView view) {
+    public WarModel(IWarView view, StorageModel storage) {
         this.view = view;
+        this.storage = storage;
     }
 
     /**
@@ -85,6 +104,10 @@ public class WarModel {
         // add cards to pool (middle of the table)
         pool.add(card1);
         pool.add(card2);
+
+        // set the drawn cards to the view
+        setCurrentlyDrawnCard(card1, true);
+        setCurrentlyDrawnCard(card2, false);
 
         // notify view of the turn
         view.onTurnStart(card1, card2);
@@ -183,5 +206,46 @@ public class WarModel {
      */
     public boolean isWar() {
         return war;
+    }
+
+    public void setIsGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public void setIsWar(boolean war) {
+        this.war = war;
+    }
+
+    public List<Card> getPool() {
+        return pool;
+    }
+
+    public void setPool(List<Card> pool) {
+        this.pool = pool;
+    }
+
+    public void setPlayer(Player player, boolean p1) {
+        if (p1)
+            this.player1 = player;
+        else
+            this.player2 = player;
+    }
+
+    public void saveGame() {
+        storage.save(this);
+    }
+
+    public void loadGame() {
+        WarModel model = storage.loadGameState();
+        this.setIsGameOver(model.isGameOver());
+        this.setIsWar(model.isWar());
+        this.setPlayer(storage.loadPlayer1(), true);
+        this.setPlayer(storage.loadPlayer2(), false);
+        this.setPool(storage.loadPool());
+        this.view.setMobilisedCard(true, storage.loadMobilisedCard1());
+        this.view.setMobilisedCard(false, storage.loadMobilisedCard2());
+        this.setCurrentlyDrawnCard(storage.loadCurrentlyDrawnCard1(), true);
+        this.setCurrentlyDrawnCard(storage.loadCurrentlyDrawnCard2(), false);
+        this.view.onGameLoad();
     }
 }

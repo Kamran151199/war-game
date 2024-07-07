@@ -74,4 +74,8 @@ public interface IWarView {
      * @param winner player that did not run out of cards
      */
     public void onGameOver(Player winner);
+
+    public Card getMobilisedCard(boolean c1);
+
+    public void setMobilisedCard(boolean c1, Card card);
 }

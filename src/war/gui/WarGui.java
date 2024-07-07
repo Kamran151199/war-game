@@ -14,9 +14,9 @@ import java.awt.*;
 public class WarGui extends JPanel implements IWarView, Runnable {
     public static final String FRAME_TITLE = "War Card Game";  // window title
     public static final Dimension FRAME_SIZE = new Dimension(600, 300); // width, height in pixels
-    private WarModel model = new WarModel(this);  // model that controls the game
-    private final StorageModel storage = new StorageModel(this);  // storage for saving and loading games
-    private final GameOptionsDialog options = new GameOptionsDialog(this, storage);  // dialog for starting a new game or loading a saved game
+    private final StorageModel storage = new StorageModel(this);
+    private final WarModel model = new WarModel(this, storage);  // model that controls the game
+
     private final HeaderPanel header = new HeaderPanel(model);  // header panel
     private final TablePanel table = new TablePanel();  // playing table
     private final ControlPanel controls = new ControlPanel(model, this);  // control panel (the section with buttons)
@@ -126,11 +126,8 @@ public class WarGui extends JPanel implements IWarView, Runnable {
         frame.setSize(FRAME_SIZE);
         frame.setVisible(true);
 
-//        // automatically start a new game
-//        model.newGame();
-
-        // show a popup displaying the options to start a new game or load a saved game
-        new GameOptionsDialog(this, storage).setVisible(true);
+        // automatically start a new game
+        model.newGame();
     }
 
     @Override
@@ -150,22 +147,30 @@ public class WarGui extends JPanel implements IWarView, Runnable {
 
     @Override
     public void onGameSave() {
-
+        System.out.println("Game saved.");
     }
 
     @Override
     public void onGameSaveError() {
+        System.err.println("Error saving game.");
 
     }
 
     @Override
     public void onGameLoad() {
+        System.out.println("Game loaded.");
+        // enable draw button and update stats
+        controls.getActionButton().setEnabled(true);
+        controls.updateStats();
+
+        // update the table and header
+        table.showCards(model.getCurrentlyDrawnCard(true), model.getCurrentlyDrawnCard(false));
 
     }
 
     @Override
     public void onGameLoadError() {
-
+        System.err.println("Error loading game.");
     }
 
     @Override
@@ -232,5 +237,23 @@ public class WarGui extends JPanel implements IWarView, Runnable {
         header.setMessage(HeaderPanel.MESSAGE_GAME_OVER, winner.getName());
         controls.getActionButton().setEnabled(false);
         controls.updateStats();
+    }
+
+    @Override
+    public Card getMobilisedCard(boolean c1) {
+        if (c1) {
+            return mobilized1;
+        } else {
+            return mobilized2;
+        }
+    }
+
+    @Override
+    public void setMobilisedCard(boolean c1, Card card) {
+        if (c1) {
+            mobilized1 = card;
+        } else {
+            mobilized2 = card;
+        }
     }
 }

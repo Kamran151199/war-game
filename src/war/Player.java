@@ -1,5 +1,6 @@
 package war;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -9,8 +10,10 @@ import java.util.LinkedList;
  *
  * @author Komron Valijonov
  */
-public class Player {
-    private final LinkedList<Card> deck;
+public class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private LinkedList<Card> deck;
     private String name;
 
     /**
@@ -80,5 +83,23 @@ public class Player {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Returns the deck of cards this player has.
+     *
+     * @return deck of cards
+     */
+    public LinkedList<Card> getDeck() {
+        return deck;
+    }
+
+    /**
+     * Sets the deck of cards this player has.
+     *
+     * @param deck to be set
+     */
+    public void setDeck(LinkedList<Card> deck) {
+        this.deck = deck;
     }
 }
